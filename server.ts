@@ -1,5 +1,16 @@
+import fastifySwagger from "@fastify/swagger";
+import {
+  validatorCompiler,
+  serializerCompiler,
+  type ZodTypeProvider,
+  jsonSchemaTransform,
+} from "fastify-type-provider-zod";
 import fastify from "fastify";
-import crypto from "node:crypto";
+import { createCourseRoute } from "./src/routes/create-course.ts";
+import { getCourseByIdRoute } from "./src/routes/get-courses-by-id.ts";
+import { getCoursesRoute } from "./src/routes/get-courses.ts";
+import { deleteCourseByIdRoute } from "./src/routes/delete-course-by-id.ts";
+import scalarAPIReference from "@scalar/fastify-api-reference";
 
 const server = fastify({
   logger: {
@@ -11,67 +22,31 @@ const server = fastify({
       },
     },
   },
+}).withTypeProvider<ZodTypeProvider>();
+
+server.register(fastifySwagger, {
+  openapi: {
+    info: {
+      title: "Desafio node.js",
+      version: "1.0.0",
+    },
+  },
+  transform: jsonSchemaTransform,
 });
 
-const courses = [
-  {
-    id: "1",
-    title: "Introduction to Programming",
-    description: "Learn the basics of programming using Python.",
-  },
-  {
-    id: "2",
-    title: "Web Development",
-    description: "Build dynamic websites using HTML, CSS, and JavaScript.",
-  },
-  {
-    id: "3",
-    title: "Data Science",
-    description: "Explore data analysis and machine learning techniques.",
-  },
-];
-
-server.get("/courses", async (request, reply) => {
-  return { courses };
-});
-
-server.get("/courses/:id", async (request, reply) => {
-  type Params = {
-    id: string;
-  };
-
-  const params = request.params as Params;
-  const courseId = params.id;
-
-  const course = courses.find((course) => course.id === courseId);
-
-  if (course) {
-    return { course };
-  }
-
-  return reply.status(404).send({ error: "Course not found" });
-});
-
-server.post("/courses", async (request, reply) => {
-  type body = {
-    title: string;
-  };
-  const courseId = crypto.randomUUID();
-  const body = request.body as body;
-  const courseTitle = body.title;
-
-  if (!courseTitle) {
-    return reply.status(400).send({ message: "Course title is required" });
-  }
-
-  courses.push({
-    id: courseId,
-    title: "New Course",
-    description: "This is a new course.",
+if (process.env.NODE_ENV === "development") {
+  server.register(scalarAPIReference, {
+    routePrefix: "/docs",
   });
 
-  return reply.status(201).send({ courseId });
-});
+  server.register(createCourseRoute);
+  server.register(getCourseByIdRoute);
+  server.register(getCoursesRoute);
+  server.register(deleteCourseByIdRoute);
+
+  server.setSerializerCompiler(serializerCompiler); //
+  server.setValidatorCompiler(validatorCompiler); //checagem nos dados de entradam por exemplo: se o titulo e uma string
+}
 
 server.listen({ port: 3333 }).then(() => {
   console.log("Server is running on http://localhost:3333");

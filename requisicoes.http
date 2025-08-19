@@ -2,11 +2,14 @@ POST  http://localhost:3333/courses
 Content-Type: application/json
 
 {
-  "title": "Curso de JavaScript"
+  "title": "a"
 }
 
 ###
 GET http://localhost:3333/courses
 
 ###
-GET http://localhost:3333/courses/334c0b79-fa48-4bb2-8776-80acb04a39b8
+GET http://localhost:3333/courses/aae914e8-6445-4ba8-96c4-448f023b26c1
+
+###
+DELETE http://localhost:3333/courses/df5bc0e8-4983-4ecb-a65a-4e9cd3afbfce
