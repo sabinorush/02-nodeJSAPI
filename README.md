@@ -68,6 +68,8 @@ sequenceDiagram
 
 - Node.js v22.18.0 ou superior
 - npm (Node Package Manager)
+- Docker e Docker Compose
+- [PostgreSQL] (fornecido via Docker)
 
 ## Instalação
 
@@ -87,7 +89,26 @@ sequenceDiagram
    ```
 
 4. Configure as variáveis de ambiente:
-   - Crie um arquivo `.env` na raiz do projeto e adicione as variáveis necessárias.
+   - Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
+   ```env
+   NODE_ENV=development
+   DATA_BASE_URL="postgres://postgres:postgres@localhost:5432/desafioNodeAPI"
+   ```
+
+5. Inicie o banco de dados PostgreSQL com Docker:
+   ```bash
+   # Iniciar o container PostgreSQL
+   docker compose up -d
+
+   # Para parar o container
+   docker compose down
+   ```
+
+   O Docker Compose irá criar um container PostgreSQL com as seguintes configurações:
+   - **Porta**: 5432 (mapeada para 5432 do host)
+   - **Usuário**: postgres
+   - **Senha**: postgres
+   - **Banco de dados**: desafioNodeAPI
 
 ## Scripts Disponíveis
 
